@@ -25,7 +25,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:neo4j:1.20.4")
     testImplementation("ai.koog:agents-test:1.0.0")
-    testImplementation("io.mockk:mockk:1.14.9")
+    testImplementation("io.mockk:mockk:1.14.11")
     testImplementation(kotlin("test"))
 }
 
