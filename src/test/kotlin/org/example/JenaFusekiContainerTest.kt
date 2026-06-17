@@ -1,8 +1,6 @@
 package org.example
 
-import org.apache.jena.sparql.exec.http.QueryExecHTTP
-import org.apache.jena.sparql.exec.http.UpdateExecHTTP
-import org.apache.jena.sparql.exec.http.UpdateSendMode
+import org.apache.jena.rdfconnection.RDFConnectionRemote
 import org.junit.jupiter.api.Test
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
@@ -25,7 +23,7 @@ class JenaFusekiContainerTest {
             val updateEndpoint = "http://${fuseki.host}:${fuseki.getMappedPort(FUSEKI_PORT)}/$DATASET_NAME/update"
             val queryEndpoint = "http://${fuseki.host}:${fuseki.getMappedPort(FUSEKI_PORT)}/$DATASET_NAME/query"
 
-            // Register admin credentials for the endpoints
+            // Register admin credentials for the endpoints.
             org.apache.jena.http.auth.AuthEnv.get().registerUsernamePassword(
                 java.net.URI.create(updateEndpoint),
                 "admin",
@@ -37,63 +35,51 @@ class JenaFusekiContainerTest {
                 ADMIN_PASSWORD,
             )
 
-            // Wait for the dynamically created dataset to be ready
-            var datasetReady = false
-            for (i in 1..30) {
-                try {
-                    QueryExecHTTP
-                        .service(queryEndpoint)
-                        .useGet()
-                        .query("ASK {}")
-                        .build()
-                        .use { it.ask() }
-                    datasetReady = true
-                    break
-                } catch (e: Exception) {
-                    Thread.sleep(1000)
-                }
-            }
-            if (!datasetReady) {
-                throw AssertionError("Dataset $DATASET_NAME was not created in time")
-            }
-
-            UpdateExecHTTP
-                .service(updateEndpoint)
-                .sendMode(UpdateSendMode.asPost)
-                .update(
-                    """
-                    INSERT DATA {
-                      <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> "$NAME"
-                    }
-                    """.trimIndent(),
-                ).build()
-                .execute()
-
-            val names = mutableListOf<String>()
-
-            QueryExecHTTP
-                .service(queryEndpoint)
-                .useGet()
-                .query(
-                    """
-                    SELECT ?name WHERE {
-                      <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> ?name
-                    }
-                    """.trimIndent(),
-                ).build()
-                .use { queryExec ->
-                    val rowSet = queryExec.select()
-                    try {
-                        while (rowSet.hasNext()) {
-                            names += rowSet.next().get("name").getLiteralLexicalForm()
+            RDFConnectionRemote
+                .create()
+                .queryEndpoint(queryEndpoint)
+                .updateEndpoint(updateEndpoint)
+                .build()
+                .use { conn ->
+                    // Wait for the dynamically created dataset to be ready.
+                    var datasetReady = false
+                    for (i in 1..30) {
+                        try {
+                            if (conn.queryAsk("ASK {}")) {
+                                datasetReady = true
+                                break
+                            }
+                        } catch (e: Exception) {
+                            Thread.sleep(1000)
                         }
-                    } finally {
-                        rowSet.close()
                     }
-                }
+                    if (!datasetReady) {
+                        throw AssertionError("Dataset $DATASET_NAME was not created in time")
+                    }
 
-            assertEquals(listOf(NAME), names)
-            assertTrue(names.contains(NAME))
+                    conn.update(
+                        """
+                        INSERT DATA {
+                          <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> "$NAME"
+                        }
+                        """.trimIndent(),
+                    )
+
+                    val names = mutableListOf<String>()
+
+                    conn.querySelect(
+                        """
+                        SELECT ?name WHERE {
+                          <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> ?name
+                        }
+                        """.trimIndent(),
+                    ) { qs ->
+                        names += qs.getLiteral("name").lexicalForm
+                    }
+
+                    assertEquals(listOf(NAME), names)
+                    assertTrue(names.contains(NAME))
+                }
         } finally {
             println("--- FUSEKI CONTAINER LOGS ---")
             println(fuseki.getLogs())
