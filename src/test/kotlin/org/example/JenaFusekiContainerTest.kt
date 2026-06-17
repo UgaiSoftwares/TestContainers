@@ -1,9 +1,9 @@
 package org.example
 
-import org.junit.jupiter.api.Test
 import org.apache.jena.sparql.exec.http.QueryExecHTTP
 import org.apache.jena.sparql.exec.http.UpdateExecHTTP
 import org.apache.jena.sparql.exec.http.UpdateSendMode
+import org.junit.jupiter.api.Test
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.wait.strategy.Wait
 import kotlin.test.assertEquals
@@ -29,12 +29,12 @@ class JenaFusekiContainerTest {
             org.apache.jena.http.auth.AuthEnv.get().registerUsernamePassword(
                 java.net.URI.create(updateEndpoint),
                 "admin",
-                ADMIN_PASSWORD
+                ADMIN_PASSWORD,
             )
             org.apache.jena.http.auth.AuthEnv.get().registerUsernamePassword(
                 java.net.URI.create(queryEndpoint),
                 "admin",
-                ADMIN_PASSWORD
+                ADMIN_PASSWORD,
             )
 
             // Wait for the dynamically created dataset to be ready
@@ -61,13 +61,12 @@ class JenaFusekiContainerTest {
                 .service(updateEndpoint)
                 .sendMode(UpdateSendMode.asPost)
                 .update(
-                        """
-                        INSERT DATA {
-                          <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> "$NAME"
-                        }
-                        """.trimIndent(),
-                    )
-                .build()
+                    """
+                    INSERT DATA {
+                      <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> "$NAME"
+                    }
+                    """.trimIndent(),
+                ).build()
                 .execute()
 
             val names = mutableListOf<String>()
@@ -76,13 +75,12 @@ class JenaFusekiContainerTest {
                 .service(queryEndpoint)
                 .useGet()
                 .query(
-                        """
-                        SELECT ?name WHERE {
-                          <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> ?name
-                        }
-                        """.trimIndent(),
-                    )
-                .build()
+                    """
+                    SELECT ?name WHERE {
+                      <$SUBJECT_URI> <http://xmlns.com/foaf/0.1/name> ?name
+                    }
+                    """.trimIndent(),
+                ).build()
                 .use { queryExec ->
                     val rowSet = queryExec.select()
                     try {
