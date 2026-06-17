@@ -22,6 +22,7 @@ dependencies {
     implementation("org.neo4j.driver:neo4j-java-driver:6.1.0")
     implementation("org.slf4j:slf4j-simple:2.0.18")
 //    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    testImplementation("org.apache.jena:jena-rdfconnection:6.1.0")
     testImplementation("org.testcontainers:junit-jupiter:1.20.4")
     testImplementation("org.testcontainers:neo4j:1.20.4")
     testImplementation("ai.koog:agents-test:1.0.0")
