@@ -34,8 +34,8 @@ dependencies {
     testImplementation(kotlin("test"))
 
     constraints {
-        testImplementation("ch.qos.logback:logback-classic:1.5.34")
-        testImplementation("ch.qos.logback:logback-core:1.5.34")
+        testImplementation("ch.qos.logback:logback-classic:1.5.35")
+        testImplementation("ch.qos.logback:logback-core:1.5.35")
         testImplementation("io.opentelemetry:opentelemetry-api:1.62.0")
     }
 }
