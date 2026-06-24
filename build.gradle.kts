@@ -30,18 +30,16 @@ application {
     // mainClass.set("Example")
 }
 
-tasks {
-    val execute by registering(JavaExec::class) {
-        group = "application"
-        mainClass.set(
-            if (project.hasProperty("mainClass")) {
-                project.property("mainClass") as String
-            } else {
-                application.mainClass.get()
-            },
-        )
-        classpath = sourceSets.main.get().runtimeClasspath
-    }
+tasks.register<JavaExec>("execute") {
+    group = "application"
+    mainClass.set(
+        if (project.hasProperty("mainClass")) {
+            project.property("mainClass") as String
+        } else {
+            application.mainClass.get()
+        },
+    )
+    classpath = sourceSets.main.get().runtimeClasspath
 }
 
 kotlin {
