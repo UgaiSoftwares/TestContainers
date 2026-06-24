@@ -2,7 +2,6 @@ import org.jlleitschuh.gradle.ktlint.reporter.ReporterType
 
 plugins {
     kotlin("jvm") version "2.4.0"
-    kotlin("plugin.serialization") version "2.4.0"
     id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
     application
 }
@@ -15,29 +14,11 @@ repositories {
 }
 
 dependencies {
-    implementation("ai.koog:koog-agents:1.0.0")
-    implementation("ai.koog:agents-features-event-handler:1.0.0")
-    implementation("ai.koog:agents-features-trace:1.0.0")
-    implementation("ai.koog:agents-features-opentelemetry:1.0.0")
     implementation("org.neo4j.driver:neo4j-java-driver:6.1.0")
-    implementation("org.slf4j:slf4j-simple:2.0.18")
-//    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
-    testImplementation(platform("io.netty:netty-bom:4.2.15.Final"))
-    testImplementation("org.apache.jena:jena-arq:6.1.0") {
-        exclude(group = "org.apache.thrift", module = "libthrift")
-    }
     testImplementation("org.apache.jena:jena-rdfconnection:6.1.0")
     testImplementation("org.testcontainers:junit-jupiter:1.21.4")
     testImplementation("org.testcontainers:neo4j:1.21.4")
-    testImplementation("ai.koog:agents-test:1.0.0")
-    testImplementation("io.mockk:mockk:1.14.11")
     testImplementation(kotlin("test"))
-
-    constraints {
-        testImplementation("ch.qos.logback:logback-classic:1.5.34")
-        testImplementation("ch.qos.logback:logback-core:1.5.34")
-        testImplementation("io.opentelemetry:opentelemetry-api:1.62.0")
-    }
 }
 
 tasks.test {
