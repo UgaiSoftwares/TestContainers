@@ -9,7 +9,7 @@ import org.testcontainers.junit.jupiter.Container
 import org.testcontainers.junit.jupiter.Testcontainers
 import kotlin.test.assertEquals
 
-@Testcontainers
+@Testcontainers(disabledWithoutDocker = true)
 class Neo4jContainerTest {
     companion object {
         private const val ADMIN_PASSWORD = "testpassword"
